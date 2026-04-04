@@ -1,3 +1,4 @@
+// Camada que encapsula o objeto para ser injetado no Banco de dados
 package br.com.sispoli.model;
 
 import java.time.LocalDate;
