@@ -1,0 +1,70 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<name>sispoli</name>
+
+	<!-- 1. Coordenaddas do Projeto -->
+	<groupId>br.com.muvesol</groupId>
+	<artifactId>sispoli</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>jar</packaging>
+
+	<!-- 2. Propriedades ( Configurações de Compilação e Encoding )-->
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<!-- Especifica a versão do Java (ex: 1.8, 11, 17) -->
+		<maven.compiler.source>21</maven.compiler.source>
+		<maven.compiler.target>21</maven.compiler.target>
+	</properties>
+
+	<!-- 3. Build e Plugins -->
+	<!-- Source:
+	https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin -->
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.14.1</version>
+			</plugin>
+		</plugins>
+	</build>
+
+	<!-- 4. Dependencias -->
+	<dependencies>
+		<!-- Source:
+		https://mvnrepository.com/artifact/org.apache.maven.plugins/maven-compiler-plugin -->
+
+		<!-- Conector Java MariaDB -->
+		<dependency>
+			<groupId>org.mariadb.jdbc</groupId>
+			<artifactId>mariadb-java-client</artifactId>
+			<version>3.3.3</version>
+		</dependency>
+
+		<!-- Encoding para Código de Barras do Google -->
+		<dependency>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>core</artifactId>
+			<version>3.5.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.zxing</groupId>
+			<artifactId>javase</artifactId>
+			<version>3.5.1</version>
+		</dependency>
+		<dependency>
+			<groupId>com.formdev</groupId>
+			<artifactId>flatlaf</artifactId>
+			<version>3.4.1</version>
+		</dependency>
+		<dependency>
+			<groupId>br.com.muvesol</groupId>
+			<artifactId>sistema-ginasio</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+	</dependencies>
+
+
+</project>
