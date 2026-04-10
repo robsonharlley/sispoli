@@ -59,11 +59,7 @@
 			<artifactId>flatlaf</artifactId>
 			<version>3.4.1</version>
 		</dependency>
-		<dependency>
-			<groupId>br.com.muvesol</groupId>
-			<artifactId>sistema-ginasio</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
-		</dependency>
+
 	</dependencies>
 
 
