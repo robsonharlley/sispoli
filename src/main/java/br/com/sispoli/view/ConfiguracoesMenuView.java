@@ -8,19 +8,19 @@ import java.awt.event.MouseEvent;
 import java.util.HashMap;
 import java.util.Map;
 
-public class MenuPrincipalView extends JFrame {
+public class ConfiguracoesMenuView extends JFrame {
 
     private final Map<String, JButton> moduleButtons = new HashMap<>();
-    private JLabel lblStatus;
+    private JLabel lblTitulo, lblStatus;
 
-    public MenuPrincipalView() {
+    public ConfiguracoesMenuView() {
         inicializarComponentes();
     }
 
     private void inicializarComponentes() {
-        setTitle("SISPOLI - Gestão de Ginásio");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1100, 750);
+        setTitle("⚙️ Painel Administrativo - SISPOLI");
+        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setSize(900, 650);
         setLocationRelativeTo(null);
         setLayout(new BorderLayout(0, 0));
         getContentPane().setBackground(new Color(241, 245, 249));
@@ -30,44 +30,45 @@ public class MenuPrincipalView extends JFrame {
         header.setBackground(new Color(30, 41, 59));
         header.setBorder(new EmptyBorder(15, 25, 15, 25));
         
-        JLabel lblTitulo = new JLabel("🏢 SISPOLI | Sistema de Gestão");
+        lblTitulo = new JLabel("⚙️ Painel Administrativo");
         lblTitulo.setForeground(Color.WHITE);
-        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 20));
+        lblTitulo.setFont(new Font("Segoe UI", Font.BOLD, 18));
         header.add(lblTitulo, BorderLayout.WEST);
 
-        JPanel userInfo = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
-        userInfo.setBackground(new Color(30, 41, 59));
-        
-        JLabel lblUser = new JLabel("👤 Admin | v1.0.0");
-        lblUser.setForeground(new Color(148, 163, 184));
-        userInfo.add(lblUser);
-        
-        header.add(userInfo, BorderLayout.EAST);
+        JButton btnVoltar = new JButton("← Voltar ao Menu");
+        btnVoltar.setBackground(new Color(71, 85, 105));
+        btnVoltar.setForeground(Color.WHITE);
+        btnVoltar.setFocusPainted(false);
+        btnVoltar.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        header.add(btnVoltar, BorderLayout.EAST);
+
         add(header, BorderLayout.NORTH);
 
         // === CONTEÚDO PRINCIPAL ===
         JPanel mainPanel = new JPanel(new GridBagLayout());
         mainPanel.setBackground(new Color(241, 245, 249));
-        mainPanel.setBorder(new EmptyBorder(30, 40, 20, 40));
+        mainPanel.setBorder(new EmptyBorder(40, 30, 30, 30));
         GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(12, 12, 12, 12);
+        gbc.insets = new Insets(15, 15, 15, 15);
         gbc.fill = GridBagConstraints.BOTH;
         gbc.weightx = 1.0; gbc.weighty = 1.0;
 
+        // Módulos administrativos
         String[][] modulos = {
-            {"🎓 Enturmações", "Vínculo aluno-turma e matrículas", "06B6D4"},
-            {"📊 Frequência", "Registro de presenças e faltas", "EC4899"},
-            {"⚠️ Ocorrências", "Registro de incidentes e disciplina", "EF4444"},
-            {"👨‍👩‍👧 Responsáveis", "Cadastro de pais e responsáveis", "14B8A6"},
-            {"⚙️ Configurações", "Parâmetros do sistema", "6B7280"}
+            {"📍 Locais", "Gerenciar espaços físicos do ginásio", "3B82F6"},
+            {"📮 CEPs", "Base de endereços e logradouros", "10B981"},
+            {"👨‍🏫 Professores", "Cadastro e gestão de docentes", "8B5CF6"},
+            {"🔐 Banco de Dados", "Configurar conexão e parâmetros", "F59E0B"},
+            {"🎒 Turmas", "Organização de grupos e horários", "F59E0B"},
+            {"👥 Lotação", "Vincular professores às turmas", "06B6D4"}
         };
 
         for (int i = 0; i < modulos.length; i++) {
-            gbc.gridx = i % 3;
-            gbc.gridy = i / 3;
-            gbc.weightx = 0.33; gbc.weighty = 0.33;
+            gbc.gridx = i % 2;  // 2 colunas
+            gbc.gridy = i / 2;
+            gbc.weightx = 0.5; gbc.weighty = 0.5;
 
-            JButton btn = criarBotaoModulo(modulos[i][0], modulos[i][1], Color.decode("#" + modulos[i][2]));
+            JButton btn = criarCardModulo(modulos[i][0], modulos[i][1], Color.decode("#" + modulos[i][2]));
             mainPanel.add(btn, gbc);
             moduleButtons.put(modulos[i][0], btn);
         }
@@ -77,19 +78,22 @@ public class MenuPrincipalView extends JFrame {
         // === FOOTER ===
         JPanel footer = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 8));
         footer.setBackground(new Color(30, 41, 59));
-        lblStatus = new JLabel("✅ Sistema pronto. Selecione um módulo.");
+        lblStatus = new JLabel("✅ Selecione um módulo para administrar");
         lblStatus.setForeground(new Color(148, 163, 184));
         lblStatus.setFont(new Font("Segoe UI", Font.PLAIN, 13));
         footer.add(lblStatus);
         add(footer, BorderLayout.SOUTH);
+
+        // Listener do botão Voltar
+        btnVoltar.addActionListener(e -> dispose());
     }
 
-    private JButton criarBotaoModulo(String titulo, String descricao, Color corPrimaria) {
+    private JButton criarCardModulo(String titulo, String descricao, Color corPrimaria) {
         JPanel card = new JPanel(new BorderLayout(15, 8));
         card.setBackground(Color.WHITE);
         card.setBorder(BorderFactory.createCompoundBorder(
             BorderFactory.createLineBorder(new Color(226, 232, 240), 2, true),
-            new EmptyBorder(18, 20, 18, 20)
+            new EmptyBorder(20, 25, 20, 25)
         ));
         card.setCursor(new Cursor(Cursor.HAND_CURSOR));
 
@@ -98,9 +102,7 @@ public class MenuPrincipalView extends JFrame {
         lblTitulo.setForeground(new Color(30, 41, 59));
         card.add(lblTitulo, BorderLayout.NORTH);
 
-        JLabel lblDesc = new JLabel(descricao);
-        lblDesc.setFont(new Font("Segoe UI", Font.PLAIN, 13));
-        lblDesc.setForeground(new Color(100, 116, 139));
+        JLabel lblDesc = new JLabel("<html><span style='color:#64748b;font-size:13px'>" + descricao + "</span></html>");
         card.add(lblDesc, BorderLayout.CENTER);
 
         JButton btn = new JButton();
@@ -112,13 +114,12 @@ public class MenuPrincipalView extends JFrame {
         btn.setContentAreaFilled(false);
 
         // Efeito Hover
-        Color corHover = new Color(corPrimaria.getRed(), corPrimaria.getGreen(), corPrimaria.getBlue(), 15);
         btn.addMouseListener(new MouseAdapter() {
             public void mouseEntered(MouseEvent e) {
                 card.setBackground(new Color(245, 250, 255));
                 card.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createLineBorder(corPrimaria, 2, true),
-                    new EmptyBorder(18, 20, 18, 20)
+                    new EmptyBorder(20, 25, 20, 25)
                 ));
                 lblTitulo.setForeground(corPrimaria);
             }
@@ -126,7 +127,7 @@ public class MenuPrincipalView extends JFrame {
                 card.setBackground(Color.WHITE);
                 card.setBorder(BorderFactory.createCompoundBorder(
                     BorderFactory.createLineBorder(new Color(226, 232, 240), 2, true),
-                    new EmptyBorder(18, 20, 18, 20)
+                    new EmptyBorder(20, 25, 20, 25)
                 ));
                 lblTitulo.setForeground(new Color(30, 41, 59));
             }
@@ -137,9 +138,28 @@ public class MenuPrincipalView extends JFrame {
 
     // === MÉTODOS EXPOSTOS AO CONTROLLER ===
     public JButton getBotao(String modulo) { return moduleButtons.get(modulo); }
-    public void setStatus(String msg) { lblStatus.setText(msg); }
+    
+    public void setStatus(String msg) { 
+        lblStatus.setText(msg); 
+        lblStatus.setForeground(new Color(148, 163, 184));
+    }
+    
+    public void setStatusSucesso(String msg) { 
+        lblStatus.setText(msg); 
+        lblStatus.setForeground(new Color(34, 197, 94));
+    }
+    
+    public void setStatusErro(String msg) { 
+        lblStatus.setText(msg); 
+        lblStatus.setForeground(new Color(220, 53, 69));
+    }
+
     public void adicionarListenerBotao(String modulo, java.awt.event.ActionListener l) {
         JButton btn = moduleButtons.get(modulo);
         if (btn != null) btn.addActionListener(l);
+    }
+    
+    public void adicionarListenerVoltar(java.awt.event.ActionListener l) {
+        // Já implementado no botão Voltar, mas exposto para flexibilidade
     }
 }
