@@ -1,10 +1,17 @@
 package br.com.sispoli.controller;
 
-import br.com.sispoli.dao.*;
-import br.com.sispoli.view.*;
-import javax.swing.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+
+import javax.swing.JFrame;
+import javax.swing.JOptionPane;
+import javax.swing.SwingUtilities;
+
+import br.com.sispoli.view.ConfiguracoesMenuView;
+import br.com.sispoli.view.MenuPrincipalView;
+import br.com.sispoli.dao.EnturmacaoDAO;
+import br.com.sispoli.view.CadastroEnturmacoesView;
+import br.com.sispoli.controller.CadastroEnturmacoesController;
 
 public class MenuPrincipalController {
     private final MenuPrincipalView view;
@@ -34,8 +41,32 @@ public class MenuPrincipalController {
             });
         });
 
+     // 🎓 Enturmações (acesso direto pelo menu principal)
+        view.adicionarListenerBotao("🎓 Enturmações", e -> {
+            javax.swing.SwingUtilities.invokeLater(() -> {
+                try {
+                    CadastroEnturmacoesView v = new CadastroEnturmacoesView();
+                    new CadastroEnturmacoesController(v, new EnturmacaoDAO());
+                    v.setVisible(true);
+                    
+                    v.addWindowListener(new java.awt.event.WindowAdapter() {
+                        public void windowClosed(java.awt.event.WindowEvent we) {
+                            view.setStatus("✅ Enturmações finalizado.");
+                        }
+                    });
+                } catch (Throwable t) {
+                    System.err.println("🔥 FATAL ao abrir Enturmações:");
+                    t.printStackTrace();
+                    view.setStatus("❌ Falha crítica ao abrir módulo.");
+                    javax.swing.JOptionPane.showMessageDialog(view, 
+                        "Erro interno ao abrir tela:\n" + t.getMessage(), 
+                        "Erro Fatal", javax.swing.JOptionPane.ERROR_MESSAGE);
+                }
+            });
+        });
+        
         // 🔮 Módulos futuros (placeholders)
-        String[] modulosFuturos = {"🎒 Turmas", "🎓 Enturmações", "📊 Frequência", 
+        String[] modulosFuturos = {"🎒 Turmas", "📊 Frequência", 
                                    "⚠️ Ocorrências", "👨‍👩‍👧 Responsáveis" };
         for (String modulo : modulosFuturos) {
             view.adicionarListenerBotao(modulo, e -> {

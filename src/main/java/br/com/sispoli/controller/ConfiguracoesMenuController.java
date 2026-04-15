@@ -7,15 +7,20 @@ import javax.swing.SwingUtilities;
 import br.com.sispoli.dao.CepDAO;
 import br.com.sispoli.dao.ConfigDAO;
 import br.com.sispoli.dao.LocalDAO;
+import br.com.sispoli.dao.LotacaoProfessorDAO;
 import br.com.sispoli.dao.ProfessorDAO;
+import br.com.sispoli.dao.TurmaDAO;
 import br.com.sispoli.view.CadastroCEPsView;
 import br.com.sispoli.view.CadastroLocaisView;
+import br.com.sispoli.view.CadastroLotacaoView;
 import br.com.sispoli.view.CadastroProfessoresView;
+import br.com.sispoli.view.CadastroTurmasView;
 import br.com.sispoli.view.ConfiguracaoDBView;
 import br.com.sispoli.view.ConfiguracoesMenuView;
-import br.com.sispoli.dao.LotacaoProfessorDAO;
-import br.com.sispoli.view.CadastroLotacaoView;
-import br.com.sispoli.controller.CadastroLotacaoController;
+import br.com.sispoli.dao.EnturmacaoDAO;
+import br.com.sispoli.view.CadastroEnturmacoesView;
+import br.com.sispoli.controller.CadastroEnturmacoesController;
+
 
 public class ConfiguracoesMenuController {
 	private final ConfiguracoesMenuView view;
@@ -62,6 +67,22 @@ public class ConfiguracoesMenuController {
                 new CadastroLotacaoController(v, new LotacaoProfessorDAO());
                 return v;
             }, "Cadastro de Lotação de Professores"));
+        
+     // 🎒 Cadastro de Turmas
+        view.adicionarListenerBotao("🎒 Turmas", e -> abrirTela(
+            () -> {
+                CadastroTurmasView v = new CadastroTurmasView();
+                new CadastroTurmasController(v, new TurmaDAO());
+                return v;
+            }, "Cadastro de Turmas"));
+        
+     // 🎓 Enturmações
+        view.adicionarListenerBotao("🎓 Enturmações", e -> abrirTela(
+            () -> {
+                CadastroEnturmacoesView v = new CadastroEnturmacoesView();
+                new CadastroEnturmacoesController(v, new EnturmacaoDAO());
+                return v;
+            }, "Cadastro de Enturmações"));
 	}
 
 	private void abrirTela(JFrameFactory factory, String nomeTela) {
