@@ -3,6 +3,7 @@ package br.com.sispoli.controller;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -30,6 +31,34 @@ public class MenuPrincipalController {
 
 		// ⚙️ Configurações → ABRE O SUB-MENU (alteração principal)
 		view.adicionarListenerBotao("⚙️ Configurações", e -> {
+		    // ✅ Verifica senha antes de abrir
+		    if (br.com.sispoli.security.SegurancaUtil.verificarAcessoConfiguracoes(view)) {
+		        view.setStatus("🔐 Autenticado. Abrindo Painel Administrativo...");
+		        SwingUtilities.invokeLater(() -> {
+		            ConfiguracoesMenuView subMenu = new ConfiguracoesMenuView();
+		            new ConfiguracoesMenuController(subMenu);
+		            subMenu.setVisible(true);
+		            subMenu.addWindowListener(new java.awt.event.WindowAdapter() {
+		                @Override
+		                public void windowClosed(java.awt.event.WindowEvent we) {
+		                    view.setStatus("✅ Painel administrativo fechado.");
+		                }
+		            });
+		        });
+		    } else {
+		        view.setStatus("❌ Acesso negado: senha inválida.");
+		        // Não mostra dialog se cancelou, só se digitou errado
+		        if (e.getSource() instanceof JButton) { // Garante que foi clique, não cancelamento
+		            JOptionPane.showMessageDialog(view, "Senha incorreta. Acesso negado.",
+		                "Autenticação Falhou", JOptionPane.ERROR_MESSAGE);
+		        }
+		    }
+		});
+		
+		
+		
+		
+/*		view.adicionarListenerBotao("⚙️ Configurações", e -> {
 			view.setStatus("🔧 Abrindo Painel Administrativo...");
 			SwingUtilities.invokeLater(() -> {
 				ConfiguracoesMenuView subMenu = new ConfiguracoesMenuView();
@@ -43,7 +72,7 @@ public class MenuPrincipalController {
 				});
 			});
 		});
-
+*/
 		// 🎓 Enturmações (acesso direto pelo menu principal)
 		view.adicionarListenerBotao("🎓 Enturmações", e -> {
 			javax.swing.SwingUtilities.invokeLater(() -> {
