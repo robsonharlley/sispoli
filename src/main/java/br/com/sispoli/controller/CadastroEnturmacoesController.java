@@ -24,11 +24,8 @@ public class CadastroEnturmacoesController {
 
     private void configurarListeners() {
         view.addSalvar(this::salvar); view.addExcluir(this::excluir);
-        //view.addLimpar(e -> { view.limparFormulario(); idEmEdicao = 0; });
-     // No Controller, dentro do listener de Limpar:
         view.addLimpar(e -> { 
             view.limparFormulario(); 
-            view.setDesenturmarAgora(false); // ✅ Reseta o checkbox ao limpar
             idEmEdicao = 0; 
         });
         view.addCancelar(e -> view.dispose());
@@ -43,42 +40,36 @@ public class CadastroEnturmacoesController {
     private void salvar(ActionEvent e) {
         if(!validar()) return;
         
-     // ✅ Lógica inteligente: só pega a data se o checkbox estiver marcado
-        LocalDate dataSaida = null;
-        if (view.isDesenturmarAgora()) {
-            dataSaida = view.getDataSaida();
-            if (dataSaida == null) {
-                view.erro("⚠️ Selecione uma data de saída válida.");
-                return;
-            }
-            // Validação extra: saída não pode ser anterior à entrada
-            if (dataSaida.isBefore(view.getDataEntrada())) {
-                view.erro("⚠️ Data de saída não pode ser anterior à data de entrada.");
-                return;
-            }
-        }
-        
-        
         Enturmacao ent = new Enturmacao();
         ent.setIdEnturmacao(idEmEdicao);
         ent.setIdAluno(view.getIdAluno());
         ent.setIdTurma(view.getIdTurma());
         ent.setDataEnturmacao(view.getDataEntrada());
-        //ent.setDataDesenturmacao(view.getDataSaida());
-        ent.setDataDesenturmacao(dataSaida);
         ent.setTipo(view.getTipo());
         ent.setMotivoDesenturmacao(view.getMotivo().isEmpty() ? null : view.getMotivo());
-        ent.setStatus(view.getStatus());
         ent.setObservacoes(view.getObservacoes());
+
+        // ✅ LÓGICA AUTOMÁTICA DE DESENTURMAÇÃO
+        String status = view.getStatus();
+        LocalDate dataSaida = view.getDataSaida();
+
+        if ("Inativo".equals(status)) {
+            if (dataSaida == null) {
+                dataSaida = LocalDate.now();
+                view.setDataSaida(dataSaida); // Atualiza UI
+            }
+            ent.setDataDesenturmacao(dataSaida);
+        } else {
+            ent.setDataDesenturmacao(null); // Garante NULL para outros status
+        }
+        ent.setStatus(status);
 
         try {
             dao.salvar(ent);
-            view.info(idEmEdicao == 0 ? "✅ Enturmação registrada!" : "✅ Enturmação atualizada!");
+            view.info(idEmEdicao == 0 ? "✅ Enturmação registrada!" : "✅ Atualizado!");
             view.limparFormulario(); idEmEdicao = 0; carregarDados();
         } catch (RuntimeException ex) {
-            String msg = ex.getMessage();
-            if(msg.contains("foreign key") || msg.contains("1452")) view.erro("❌ Aluno ou Turma informados são inválidos ou não existem.");
-            else view.erro("❌ Erro ao salvar:\n" + msg);
+            view.erro("❌ Erro ao salvar:\n" + ex.getMessage());
         }
     }
 
@@ -95,61 +86,12 @@ public class CadastroEnturmacoesController {
         }
     }
 
-    /*
-    private void carregarDados() {
-        try {
-            List<Enturmacao> list = dao.listarTodos();
-            Object[][] d = new Object[list.size()][7];
-            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            
-            for(int i=0; i<list.size(); i++){
-                Enturmacao ent = list.get(i);
-                d[i] = new Object[]{ 
-                    ent.getIdEnturmacao(), ent.getNomeAluno(), ent.getNomeTurma(),
-                    ent.getDataEnturmacao().format(fmt), 
-                    ent.getDataDesenturmacao() != null ? ent.getDataDesenturmacao().format(fmt) : "-",
-                    ent.getTipo(), ent.getStatus() 
-                };
-            }
-            view.atualizarTabela(d);
-        } catch(Exception ex){ view.erro("❌ Erro ao carregar dados: " + ex.getMessage()); }
-    }
-
-
-    private void carregarDados() {
-        try {
-            List<Enturmacao> list = dao.listarTodos();
-            Object[][] dados = new Object[list.size()][7];
-            DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-            
-            for(int i = 0; i < list.size(); i++){
-                Enturmacao e = list.get(i);
-                // ✅ Garante que NENHUM campo da tabela seja null (evita Illegal Value no TableModel)
-                dados[i] = new Object[]{
-                    e.getIdEnturmacao(),
-                    e.getNomeAluno() != null ? e.getNomeAluno() : "N/A",
-                    e.getNomeTurma() != null ? e.getNomeTurma() : "N/A",
-                    e.getDataEnturmacao() != null ? e.getDataEnturmacao().format(fmt) : "-",
-                    e.getDataDesenturmacao() != null ? e.getDataDesenturmacao().format(fmt) : "-",
-                    e.getTipo() != null ? e.getTipo() : "",
-                    e.getStatus() != null ? e.getStatus() : ""
-                };
-            }
-            
-            // ✅ Força atualização na Event Dispatch Thread (EDT)
-            javax.swing.SwingUtilities.invokeLater(() -> view.atualizarTabela(dados));
-            
-        } catch(Exception ex){
-            System.err.println("❌ Erro ao carregar dados: " + ex.getMessage());
-            ex.printStackTrace(); // Mostra a linha exata no console
-            view.erro("Falha ao atualizar lista: " + ex.getMessage());
-        }
-    }
-*/
+  
     
     private void carregarDados() {
         try {
-            listaCache = dao.listarTodos(); // ✅ Guarda em cache para acesso rápido
+           // listaCache = dao.listarTodos(); // ✅ Guarda em cache para acesso rápido
+        	 listaCache = dao.listarAtivos();
             Object[][] d = new Object[listaCache.size()][7];
             DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd/MM/yyyy");
             
@@ -167,16 +109,7 @@ public class CadastroEnturmacoesController {
             view.erro("❌ Erro ao carregar dados: " + ex.getMessage()); 
         }
     }  
-/*   
-    private void carregarLinha() {
-        int l = view.getLinha(); if(l < 0) return;
-        idEmEdicao = (int)view.getVal(l, 0);
-        // Nota: Para edição completa, seria necessário buscar os IDs pelo nome ou manter cache.
-        // Aqui exibimos apenas uma mensagem informativa.
-        view.info("📝 Modo edição ativado. Para alterar, preencha novamente os campos e clique em Salvar.");
-    }
-*/
-    
+
     private void carregarLinha() {
         int l = view.getLinha();
         if(l < 0) { view.erro("⚠️ Selecione um registro na tabela."); return; }

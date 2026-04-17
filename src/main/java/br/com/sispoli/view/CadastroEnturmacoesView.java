@@ -1,17 +1,35 @@
 package br.com.sispoli.view;
 
-import javax.swing.*;
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseListener;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.List;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JSpinner;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
+import javax.swing.SpinnerDateModel;
+import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import javax.swing.table.DefaultTableModel;
 
 import br.com.sispoli.model.Enturmacao;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
 
 public class CadastroEnturmacoesView extends JFrame {
 	private JComboBox<String> cmbAluno, cmbTurma, cmbTipo, cmbMotivo, cmbStatus;
@@ -20,7 +38,10 @@ public class CadastroEnturmacoesView extends JFrame {
 	private JTable tblEnturmacoes;
 	private DefaultTableModel tableModel;
 	private JButton btnSalvar, btnLimpar, btnExcluir, btnCancelar;
-	private JCheckBox chkDesenturmar;
+	// ✅ Data "vazia" segura para evitar crash do JSpinner
+	private static final java.util.Date EMPTY_DATE = java.util.Date.from(
+	    java.time.LocalDate.of(1900, 1, 1).atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
+	);
 
 	public CadastroEnturmacoesView() {
 		inicializarComponentes();
@@ -59,43 +80,111 @@ public class CadastroEnturmacoesView extends JFrame {
 		formPanel.add(cmbTurma, gbc);
 
 		// Linha 2: Tipo & Data Entrada
-		gbc.gridx = 0;
-		gbc.gridy = 1;
-		gbc.weightx = 0.15;
-		formPanel.add(new JLabel("Tipo:"), gbc);
-		gbc.gridx = 1;
-		gbc.weightx = 0.35;
-		cmbTipo = new JComboBox<>(new String[] { "Matrícula", "Transferência", "Experimental", "Rematrícula" });
-		formPanel.add(cmbTipo, gbc);
-		gbc.gridx = 2;
-		gbc.weightx = 0.15;
-		formPanel.add(new JLabel("Data Entrada:"), gbc);
-		gbc.gridx = 3;
-		gbc.weightx = 0.35;
+		// === LINHA 1: Tipo & Data Entrada ===
+		GridBagConstraints gbcL1 = new GridBagConstraints();
+		gbcL1.insets = new Insets(5, 5, 5, 5);
+		gbcL1.fill = GridBagConstraints.HORIZONTAL;
+
+		gbcL1.gridx = 0;
+		gbcL1.gridy = 1;
+		gbcL1.weightx = 0.15;
+		formPanel.add(new JLabel("Tipo:"), gbcL1);
+
+		gbcL1.gridx = 1;
+		gbcL1.gridy = 1;
+		gbcL1.weightx = 0.35;
+		//cmbTipo = new JComboBox<>(new String[] { "Matrícula", "Transferência", "Experimental", "Rematrícula" });
+		cmbTipo = new JComboBox<>(new String[] { "Matrícula", "Rematrícula" });
+		formPanel.add(cmbTipo, gbcL1);
+
+		gbcL1.gridx = 2;
+		gbcL1.gridy = 1;
+		gbcL1.weightx = 0.15;
+		formPanel.add(new JLabel("Data Entrada:"), gbcL1);
+
+		gbcL1.gridx = 3;
+		gbcL1.gridy = 1;
+		gbcL1.weightx = 0.35;
 		spnDataEntrada = new JSpinner(new SpinnerDateModel());
 		spnDataEntrada.setEditor(new JSpinner.DateEditor(spnDataEntrada, "dd/MM/yyyy"));
 		spnDataEntrada.setValue(java.util.Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
-		formPanel.add(spnDataEntrada, gbc);
+		formPanel.add(spnDataEntrada, gbcL1);
 
-		// Linha 3: Motivo & Status
-		gbc.gridx = 0;
-		gbc.gridy = 2;
-		gbc.weightx = 0.15;
-		formPanel.add(new JLabel("Motivo Saída:"), gbc);
-		gbc.gridx = 1;
-		gbc.weightx = 0.35;
-		cmbMotivo = new JComboBox<>(new String[] { "", "Cancelamento", "Transferência", "Conclusão", "Inadimplência",
-				"Frequência Insuficiente", "Problemas de Saúde", "Mudança de Cidade", "Insatisfação", "Outros" });
-		formPanel.add(cmbMotivo, gbc);
-		gbc.gridx = 2;
-		gbc.weightx = 0.15;
-		formPanel.add(new JLabel("Status:"), gbc);
-		gbc.gridx = 3;
-		gbc.weightx = 0.35;
-		cmbStatus = new JComboBox<>(new String[] { "Ativo", "Inativo", "Trancado", "Concluído" });
-		formPanel.add(cmbStatus, gbc);
-/*
+		// === LINHA 2: Motivo Saída & Status ===
+		GridBagConstraints gbcL2 = new GridBagConstraints(); // ✅ NOVA INSTÂNCIA (evita sobreposição)
+		gbcL2.insets = new Insets(5, 5, 5, 5);
+		gbcL2.fill = GridBagConstraints.HORIZONTAL;
+
+		gbcL2.gridx = 0;
+		gbcL2.gridy = 2;
+		gbcL2.weightx = 0.15;
+		formPanel.add(new JLabel("Motivo Saída:"), gbcL2);
+
+		gbcL2.gridx = 1;
+		gbcL2.gridy = 2;
+		gbcL2.weightx = 0.35;
+		
+		//cmbMotivo = new JComboBox<>(new String[] { "", "Cancelamento", "Transferência", "Conclusão", "Inadimplência",
+		//		"Frequência Insuficiente", "Problemas de Saúde", "Mudança de Cidade", "Insatisfação", "Outros" });
+		
+		cmbMotivo = new JComboBox<>(new String[] { "", "Cancelamento", "Inadimplência", "Frequência Insuficiente", "Problemas de Saúde", "Mudança de Cidade", 
+				"Insatisfação", "Outros" });
+		
+		formPanel.add(cmbMotivo, gbcL2);
+
+		gbcL2.gridx = 2;
+		gbcL2.gridy = 2;
+		gbcL2.weightx = 0.15;
+		formPanel.add(new JLabel("Status:"), gbcL2);
+
+		gbcL2.gridx = 3;
+		gbcL2.gridy = 2;
+		gbcL2.weightx = 0.35;
+		//cmbStatus = new JComboBox<>(new String[] { "Ativo", "Inativo", "Trancado", "Concluído" });
+		cmbStatus = new JComboBox<>(new String[] { "Ativo", "Inativo" });
+		formPanel.add(cmbStatus, gbcL2);
+
+		// ✅ Listener automático: sincroniza Data Saída + Motivo conforme o Status
+		cmbStatus.addActionListener(e -> {
+		    String statusSelecionado = (String) cmbStatus.getSelectedItem();
+		    
+		    if ("Inativo".equals(statusSelecionado)) {
+		        // 1️⃣ Habilita e preenche a data de saída com hoje
+		        spnDataSaida.setEnabled(true);
+		        try {
+		            spnDataSaida.setValue(java.util.Date.from(
+		                java.time.LocalDate.now().atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
+		            ));
+		        } catch (Exception ex) { /* ignora */ }
+		        
+		        // 2️⃣ Define motivo automaticamente como "Cancelamento"
+		        // ⚠️ Nota: Usa "Cancelamento" para bater com o ENUM do banco. 
+		        // Se seu DB usar "Cancelado", altere a string abaixo.
+		        cmbMotivo.setSelectedItem("Cancelamento");
+		        
+		    } else {
+		        // 3️⃣ Desabilita e limpa a data de saída
+		        spnDataSaida.setEnabled(false);
+		        try { spnDataSaida.setValue(EMPTY_DATE); } catch (Exception ignored) {}
+		        
+		        // 4️⃣ Limpa o motivo ao sair do status Inativo
+		        cmbMotivo.setSelectedItem("");
+		    }
+		});
+
 		// Linha 4: Data Saída
+		gbc = new GridBagConstraints();
+		gbc.insets = new Insets(5, 5, 5, 5);
+		gbc.fill = GridBagConstraints.HORIZONTAL;
+
+		// Label
+		gbc.gridx = 0;
+		gbc.gridy = 3;
+		gbc.weightx = 0.15;
+		formPanel.add(new JLabel("Data Saída:"), gbc);
+
+		// Spinner (inicia DESABILITADO)
+		// Data Saída (inicia desabilitada e vazia)
 		gbc.gridx = 0;
 		gbc.gridy = 3;
 		gbc.weightx = 0.15;
@@ -104,44 +193,10 @@ public class CadastroEnturmacoesView extends JFrame {
 		gbc.weightx = 0.35;
 		spnDataSaida = new JSpinner(new SpinnerDateModel());
 		spnDataSaida.setEditor(new JSpinner.DateEditor(spnDataSaida, "dd/MM/yyyy"));
-		spnDataSaida.setValue(java.util.Date.from(LocalDate.now().atStartOfDay(ZoneId.systemDefault()).toInstant()));
-		formPanel.add(spnDataSaida, gbc);
-*/
-		
-		// Linha 4: Data Saída & Checkbox "Desenturmar agora?"
-		gbc = new GridBagConstraints();
-		gbc.insets = new Insets(5, 5, 5, 5);
-		gbc.fill = GridBagConstraints.HORIZONTAL;
-
-		// Label
-		gbc.gridx = 0; gbc.gridy = 3; gbc.weightx = 0.15;
-		formPanel.add(new JLabel("Data Saída:"), gbc);
-
-		// Spinner (inicia DESABILITADO)
-		gbc.gridx = 1; gbc.weightx = 0.35;
-		spnDataSaida = new JSpinner(new SpinnerDateModel());
-		spnDataSaida.setEditor(new JSpinner.DateEditor(spnDataSaida, "dd/MM/yyyy"));
-		spnDataSaida.setEnabled(false); // ✅ Começa desativado
+		spnDataSaida.setValue(EMPTY_DATE); // ✅ Nunca null
+		spnDataSaida.setEnabled(false);
 		formPanel.add(spnDataSaida, gbc);
 
-		// Checkbox
-		gbc.gridx = 2; gbc.weightx = 0.1; // Espaçador
-		gbc.gridx = 3; gbc.weightx = 0.4;
-		chkDesenturmar = new JCheckBox("Desenturmar agora?");
-		chkDesenturmar.setFont(new Font("Segoe UI", Font.PLAIN, 12));
-		chkDesenturmar.setFocusPainted(false);
-
-		// Listener: habilita/desabilita o Spinner e limpa a data se desmarcar
-		chkDesenturmar.addItemListener(e -> {
-		    boolean ativo = chkDesenturmar.isSelected();
-		    spnDataSaida.setEnabled(ativo);
-		    if (!ativo) {
-		        try { spnDataSaida.setValue(null); } catch (Exception ignored) {}
-		    }
-		});
-
-		formPanel.add(chkDesenturmar, gbc);
-		
 		// Linha 5: Observações (JTextArea com Scroll)
 		gbc = new GridBagConstraints();
 		gbc.insets = new Insets(5, 5, 5, 5);
@@ -277,15 +332,22 @@ public class CadastroEnturmacoesView extends JFrame {
 	}
 
 	public LocalDate getDataSaida() {
-		return ((java.util.Date) spnDataSaida.getValue()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+	    Object val = spnDataSaida.getValue();
+	    if (val == null || val.equals(EMPTY_DATE)) return null;
+	    return ((java.util.Date) val).toInstant()
+	            .atZone(java.time.ZoneId.systemDefault())
+	            .toLocalDate();
 	}
 
-	public void setDataSaida(LocalDate d) {
-		if (d != null)
-			spnDataSaida.setValue(java.util.Date.from(d.atStartOfDay(ZoneId.systemDefault()).toInstant()));
-		else
-			spnDataSaida.setValue(null);
+	public void setDataSaida(LocalDate data) {
+	    if (spnDataSaida != null) {
+	        spnDataSaida.setValue(data != null 
+	            ? java.util.Date.from(data.atStartOfDay(java.time.ZoneId.systemDefault()).toInstant())
+	            : EMPTY_DATE
+	        );
+	    }
 	}
+
 
 	public String getTipo() {
 		return (String) cmbTipo.getSelectedItem();
@@ -348,109 +410,73 @@ public class CadastroEnturmacoesView extends JFrame {
 		tblEnturmacoes.addMouseListener(l);
 	}
 
-	//public void atualizarTabela(Object[][] d) {
-	//	tableModel.setRowCount(0);
-	//	for (Object[] r : d)
-	//		tableModel.addRow(r);
-	//}
-
 	public void atualizarTabela(Object[][] dados) {
-	    try {
-	        tableModel.setRowCount(0); // Limpa de forma segura
-	        if (dados != null) {
-	            for (Object[] linha : dados) {
-	                // Validação extra: garante que a linha tem o tamanho exato das colunas
-	                if (linha != null && linha.length == 7) {
-	                    tableModel.addRow(linha);
-	                }
-	            }
-	        }
-	    } catch (IllegalArgumentException e) {
-	        System.err.println("❌ Illegal Value na tabela: " + e.getMessage());
-	        System.err.println("💡 Verifique se todos os campos em 'dados' são Strings/Integers válidos.");
-	    }
+		try {
+			tableModel.setRowCount(0); // Limpa de forma segura
+			if (dados != null) {
+				for (Object[] linha : dados) {
+					// Validação extra: garante que a linha tem o tamanho exato das colunas
+					if (linha != null && linha.length == 7) {
+						tableModel.addRow(linha);
+					}
+				}
+			}
+		} catch (IllegalArgumentException e) {
+			System.err.println("❌ Illegal Value na tabela: " + e.getMessage());
+			System.err.println("💡 Verifique se todos os campos em 'dados' são Strings/Integers válidos.");
+		}
 	}
-	
+
 	/**
 	 * Preenche todos os campos do formulário com base em uma Enturmacao existente.
 	 * Ideal para edição ou processo de desenturmação.
 	 */
 	public void carregarFormulario(Enturmacao ent) {
-	    // IDs e Combos
-	    setIdAluno(ent.getIdAluno());
-	    setIdTurma(ent.getIdTurma());
-	    
-	    // Datas
-	    setDataEntrada(ent.getDataEnturmacao());
-	    setDataSaida(ent.getDataDesenturmacao());
-	    
-	    // Campos de texto/enums
-	    setTipo(ent.getTipo());
-	    setMotivo(ent.getMotivoDesenturmacao());
-	    setStatus(ent.getStatus());
-	    setObservacoes(ent.getObservacoes());
+		setIdAluno(ent.getIdAluno());
+		setIdTurma(ent.getIdTurma());
+		setDataEntrada(ent.getDataEnturmacao());
+		setDataSaida(ent.getDataDesenturmacao());
+		setTipo(ent.getTipo());
+		setMotivo(ent.getMotivoDesenturmacao());
+		setStatus(ent.getStatus());
+		setObservacoes(ent.getObservacoes());
 
-	    // ✅ Lógica Inteligente do Checkbox "Desenturmar agora?"
-	    boolean temDesenturmacao = ent.getDataDesenturmacao() != null;
-	    setDesenturmarAgora(temDesenturmacao);
+		// ✅ Sincroniza estado do campo Data Saída com o status carregado
+		boolean desenturmado = ent.getDataDesenturmacao() != null;
+		spnDataSaida.setEnabled(desenturmado);
+
+		// Se estiver inativo mas sem data, força hoje na UI
+		if ("Inativo".equals(ent.getStatus()) && !desenturmado) {
+			setDataSaida(LocalDate.now());
+			spnDataSaida.setEnabled(true);
+		}
 	}
+
+
+public void limparFormulario() {
+    cmbAluno.setSelectedIndex(0); cmbTurma.setSelectedIndex(0);
+    cmbTipo.setSelectedIndex(0); cmbMotivo.setSelectedIndex(0); cmbStatus.setSelectedIndex(0);
+    
+    setDataEntrada(java.time.LocalDate.now());
+    setDataSaida(null); // ✅ Usa EMPTY_DATE internamente (seguro)
+    spnDataSaida.setEnabled(false);
+    
+    txtObservacoes.setText(""); tblEnturmacoes.clearSelection(); cmbAluno.requestFocusInWindow();
+}
 	
-	public void limparFormulario() {
-	    // ✅ Reset seguro de combos (evita seleção de itens inexistentes)
-	    cmbAluno.setSelectedIndex(0); 
-	    cmbTurma.setSelectedIndex(0);
-	    cmbTipo.setSelectedIndex(0); 
-	    cmbStatus.setSelectedIndex(0); 
-	    cmbMotivo.setSelectedIndex(0);
 
-	    // ✅ Reset seguro de datas (evita "Illegal Value" do JSpinner)
-	    try {
-	        spnDataEntrada.setValue(java.util.Date.from(
-	            LocalDate.now().atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
-	        ));
-	        // Em vez de null (que crasha), define data padrão. O Controller trata como "vazio" se necessário.
-	        spnDataSaida.setValue(java.util.Date.from(
-	            LocalDate.now().atStartOfDay(java.time.ZoneId.systemDefault()).toInstant()
-	            
-	        ));
-	    } catch (Exception e) {
-	        System.err.println("⚠️ Fallback ao resetar spinners: " + e.getMessage());
-	    }
-
-	    txtObservacoes.setText("");
-	    tblEnturmacoes.clearSelection();
-	    cmbAluno.requestFocusInWindow();
-	 // Adicione no final do método:
-	    setDesenturmarAgora(false); // Garante estado limpo e consistente
-	}
-	
-	//public void limparFormulario() { cmbAluno.setSelectedIndex(0);
-	//  cmbTurma.setSelectedIndex(0); cmbTipo.setSelectedIndex(0);
-	//  cmbStatus.setSelectedIndex(0); cmbMotivo.setSelectedIndex(0);
-	//  setDataEntrada(LocalDate.now()); setDataSaida(null);
-	//  txtObservacoes.setText(""); tblEnturmacoes.clearSelection();
-	//  cmbAluno.requestFocusInWindow(); }
-
-	// ✅ Estado do Checkbox
-	public boolean isDesenturmarAgora() { return chkDesenturmar.isSelected(); }
-
-	public void setDesenturmarAgora(boolean ativo) {
-	    chkDesenturmar.setSelected(ativo);
-	    spnDataSaida.setEnabled(ativo);
-	    if (!ativo) {
-	        try { spnDataSaida.setValue(null); } catch (Exception ignored) {}
-	    }
-	}
-	
 	public void info(String m) {
-	  JOptionPane.showMessageDialog(this, m, "Sucesso",
-	  JOptionPane.INFORMATION_MESSAGE); }
+		JOptionPane.showMessageDialog(this, m, "Sucesso", JOptionPane.INFORMATION_MESSAGE);
+	}
 
 	public void erro(String m) {
-	  JOptionPane.showMessageDialog(this, m, "Erro", JOptionPane.ERROR_MESSAGE); }
+		JOptionPane.showMessageDialog(this, m, "Erro", JOptionPane.ERROR_MESSAGE);
+	}
 
-	public int confirmar(String m) { return JOptionPane.showConfirmDialog(this,
-	  m, "Confirmação", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE); }
+	public int confirmar(String m) {
+		return JOptionPane.showConfirmDialog(this, m, "Confirmação", JOptionPane.YES_NO_OPTION,
+				JOptionPane.WARNING_MESSAGE);
+	}
 
 	public void refreshTable() {
 	}

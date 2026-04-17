@@ -7,11 +7,12 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+import br.com.sispoli.dao.EnturmacaoDAO;
+import br.com.sispoli.dao.ResponsavelDAO;
+import br.com.sispoli.view.CadastroEnturmacoesView;
+import br.com.sispoli.view.CadastroResponsaveisView;
 import br.com.sispoli.view.ConfiguracoesMenuView;
 import br.com.sispoli.view.MenuPrincipalView;
-import br.com.sispoli.dao.EnturmacaoDAO;
-import br.com.sispoli.view.CadastroEnturmacoesView;
-import br.com.sispoli.controller.CadastroEnturmacoesController;
 
 public class MenuPrincipalController {
     private final MenuPrincipalView view;
@@ -65,9 +66,16 @@ public class MenuPrincipalController {
             });
         });
         
+        // 👨‍👩‍👧 Responsáveis (acesso direto pelo menu principal)
+        view.adicionarListenerBotao("👨‍👩‍👧 Responsáveis", e -> abrirTela(
+        	    () -> {
+        	        CadastroResponsaveisView v = new CadastroResponsaveisView();
+        	        new CadastroResponsaveisController(v, new ResponsavelDAO());
+        	        return v;
+        	    }, "Cadastro de Responsáveis")); 
+        
         // 🔮 Módulos futuros (placeholders)
-        String[] modulosFuturos = {"🎒 Turmas", "📊 Frequência", 
-                                   "⚠️ Ocorrências", "👨‍👩‍👧 Responsáveis" };
+        String[] modulosFuturos = { "📊 Frequência", "⚠️ Ocorrências" };
         for (String modulo : modulosFuturos) {
             view.adicionarListenerBotao(modulo, e -> {
                 view.setStatus("🔄 Módulo " + modulo + " em desenvolvimento...");
