@@ -55,24 +55,6 @@ public class MenuPrincipalController {
 		    }
 		});
 		
-		
-		
-		
-/*		view.adicionarListenerBotao("⚙️ Configurações", e -> {
-			view.setStatus("🔧 Abrindo Painel Administrativo...");
-			SwingUtilities.invokeLater(() -> {
-				ConfiguracoesMenuView subMenu = new ConfiguracoesMenuView();
-				new ConfiguracoesMenuController(subMenu);
-				subMenu.setVisible(true);
-				subMenu.addWindowListener(new java.awt.event.WindowAdapter() {
-					@Override
-					public void windowClosed(java.awt.event.WindowEvent we) {
-						view.setStatus("✅ Painel administrativo fechado");
-					}
-				});
-			});
-		});
-*/
 		// 🎓 Enturmações (acesso direto pelo menu principal)
 		view.adicionarListenerBotao("🎓 Enturmações", e -> {
 			javax.swing.SwingUtilities.invokeLater(() -> {

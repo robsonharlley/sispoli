@@ -59,6 +59,7 @@ public class MenuPrincipalView extends JFrame {
             {"📊 Frequência", "Registro de presenças e faltas", "EC4899"},
             {"⚠️ Ocorrências", "Registro de incidentes e disciplina", "EF4444"},
             {"👨‍👩‍👧 Responsáveis", "Cadastro de pais e responsáveis", "14B8A6"},
+            {"📊 Relatórios", "Geração de documentos e financeiros", "F59E0B"},
             {"⚙️ Configurações", "Parâmetros do sistema", "6B7280"}
         };
 
