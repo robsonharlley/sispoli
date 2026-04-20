@@ -62,7 +62,8 @@ public class RelatoriosView extends JFrame {
             {"📅 Pagamentos (Mês)", "Conciliação financeira mensal consolidada", "EC4899"},
             {"⚠️ Inadimplentes", "Alunos com pendências financeiras abertas", "F97316"},
             {"🆓 Alunos Isentos", "Bolsistas, descontos e gratuidades", "14B8A6"},
-            {"📄 Rel. Individual", "Histórico completo por matrícula do aluno", "6B7280"}
+            {"📄 Rel. Individual", "Histórico completo por matrícula do aluno", "6B7280"},
+            {"🎒 Rel. Turmas", "Lista completa de turmas e configurações", "F59E0B"}
         };
 
         for (int i = 0; i < relatorios.length; i++) {

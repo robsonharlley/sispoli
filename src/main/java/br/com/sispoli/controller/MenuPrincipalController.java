@@ -8,14 +8,17 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 
+import br.com.sispoli.dao.AlunoDAO;
 import br.com.sispoli.dao.EnturmacaoDAO;
 import br.com.sispoli.dao.FrequenciaDAO;
 import br.com.sispoli.dao.ResponsavelDAO;
+import br.com.sispoli.view.CadastroAlunosView;
 import br.com.sispoli.view.CadastroEnturmacoesView;
 import br.com.sispoli.view.CadastroFrequenciasView;
 import br.com.sispoli.view.CadastroResponsaveisView;
 import br.com.sispoli.view.ConfiguracoesMenuView;
 import br.com.sispoli.view.MenuPrincipalView;
+import br.com.sispoli.view.RelatoriosView;
 
 public class MenuPrincipalController {
 	private final MenuPrincipalView view;
@@ -29,32 +32,38 @@ public class MenuPrincipalController {
 
 	private void configurarNavegacao() {
 
+		view.adicionarListenerBotao("👨‍🎓 Alunos", e -> abrirTela(() -> {
+			CadastroAlunosView v = new CadastroAlunosView();
+			new CadastroAlunosController(v, new AlunoDAO());
+			return v;
+		}, "Cadastro de Alunos"));
+
 		// ⚙️ Configurações → ABRE O SUB-MENU (alteração principal)
 		view.adicionarListenerBotao("⚙️ Configurações", e -> {
-		    // ✅ Verifica senha antes de abrir
-		    if (br.com.sispoli.security.SegurancaUtil.verificarAcessoConfiguracoes(view)) {
-		        view.setStatus("🔐 Autenticado. Abrindo Painel Administrativo...");
-		        SwingUtilities.invokeLater(() -> {
-		            ConfiguracoesMenuView subMenu = new ConfiguracoesMenuView();
-		            new ConfiguracoesMenuController(subMenu);
-		            subMenu.setVisible(true);
-		            subMenu.addWindowListener(new java.awt.event.WindowAdapter() {
-		                @Override
-		                public void windowClosed(java.awt.event.WindowEvent we) {
-		                    view.setStatus("✅ Painel administrativo fechado.");
-		                }
-		            });
-		        });
-		    } else {
-		        view.setStatus("❌ Acesso negado: senha inválida.");
-		        // Não mostra dialog se cancelou, só se digitou errado
-		        if (e.getSource() instanceof JButton) { // Garante que foi clique, não cancelamento
-		            JOptionPane.showMessageDialog(view, "Senha incorreta. Acesso negado.",
-		                "Autenticação Falhou", JOptionPane.ERROR_MESSAGE);
-		        }
-		    }
+			// ✅ Verifica senha antes de abrir
+			if (br.com.sispoli.security.SegurancaUtil.verificarAcessoConfiguracoes(view)) {
+				view.setStatus("🔐 Autenticado. Abrindo Painel Administrativo...");
+				SwingUtilities.invokeLater(() -> {
+					ConfiguracoesMenuView subMenu = new ConfiguracoesMenuView();
+					new ConfiguracoesMenuController(subMenu);
+					subMenu.setVisible(true);
+					subMenu.addWindowListener(new java.awt.event.WindowAdapter() {
+						@Override
+						public void windowClosed(java.awt.event.WindowEvent we) {
+							view.setStatus("✅ Painel administrativo fechado.");
+						}
+					});
+				});
+			} else {
+				view.setStatus("❌ Acesso negado: senha inválida.");
+				// Não mostra dialog se cancelou, só se digitou errado
+				if (e.getSource() instanceof JButton) { // Garante que foi clique, não cancelamento
+					JOptionPane.showMessageDialog(view, "Senha incorreta. Acesso negado.", "Autenticação Falhou",
+							JOptionPane.ERROR_MESSAGE);
+				}
+			}
 		});
-		
+
 		// 🎓 Enturmações (acesso direto pelo menu principal)
 		view.adicionarListenerBotao("🎓 Enturmações", e -> {
 			javax.swing.SwingUtilities.invokeLater(() -> {
@@ -75,6 +84,22 @@ public class MenuPrincipalController {
 					javax.swing.JOptionPane.showMessageDialog(view, "Erro interno ao abrir tela:\n" + t.getMessage(),
 							"Erro Fatal", javax.swing.JOptionPane.ERROR_MESSAGE);
 				}
+			});
+		});
+
+		// 📊 Central de Relatórios
+		view.adicionarListenerBotao("📊 Relatórios", e -> {
+			view.setStatus("📄 Abrindo Central de Relatórios...");
+			SwingUtilities.invokeLater(() -> {
+				RelatoriosView telaRel = new RelatoriosView();
+				new RelatoriosController(telaRel);
+				telaRel.setVisible(true);
+				telaRel.addWindowListener(new java.awt.event.WindowAdapter() {
+					@Override
+					public void windowClosed(java.awt.event.WindowEvent we) {
+						view.setStatus("✅ Central de relatórios fechada.");
+					}
+				});
 			});
 		});
 

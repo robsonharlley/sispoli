@@ -55,6 +55,7 @@ public class MenuPrincipalView extends JFrame {
         gbc.weightx = 1.0; gbc.weighty = 1.0;
 
         String[][] modulos = {
+            {"👨‍🎓 Alunos", "Cadastro e gestão de discentes", "3B82F6"},
             {"🎓 Enturmações", "Vínculo aluno-turma e matrículas", "06B6D4"},
             {"📊 Frequência", "Registro de presenças e faltas", "EC4899"},
             {"⚠️ Ocorrências", "Registro de incidentes e disciplina", "EF4444"},

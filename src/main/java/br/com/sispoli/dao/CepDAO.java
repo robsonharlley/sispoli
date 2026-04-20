@@ -1,5 +1,6 @@
 package br.com.sispoli.dao;
 
+import br.com.sispoli.config.DatabaseConfig;
 import br.com.sispoli.model.Cep;
 import java.sql.*;
 import java.util.ArrayList;
@@ -72,4 +73,59 @@ public class CepDAO {
         }
         return lista;
     }
+    
+    public List<Cep> listarTodosParaCombo() {
+        List<Cep> lista = new ArrayList<>();
+        String sql = "SELECT id_cep, logradouro, bairro, cidade, estado, observacoes FROM tabceps ORDER BY logradouro";
+        try (Connection conn = DriverManager.getConnection(
+                DatabaseConfig.getInstance().getConnectionUrl(),
+                DatabaseConfig.getInstance().getUser(),
+                DatabaseConfig.getInstance().getPass());
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            
+            while (rs.next()) {
+                Cep c = new Cep();
+                c.setId_cep(rs.getString("id_cep"));
+                c.setLogradouro(rs.getString("logradouro"));
+                c.setBairro(rs.getString("bairro"));
+                c.setCidade(rs.getString("cidade"));
+                c.setEstado(rs.getString("estado"));
+                c.setObservacoes(rs.getString("observacoes"));
+                lista.add(c);
+            }
+        } catch (SQLException e) { System.err.println("❌ Erro ao carregar CEPs: " + e.getMessage()); }
+        return lista;
+    }
+    
+    public Cep buscarPorId(String cep) {
+        String cepLimpo = cep.replaceAll("\\D", "");
+        String sql = "SELECT id_cep, cidade, bairro, logradouro, estado, observacoes " +
+                     "FROM tabceps WHERE REPLACE(id_cep, '-', '') = ?";
+        
+        try (Connection conn = DriverManager.getConnection(
+                DatabaseConfig.getInstance().getConnectionUrl(),
+                DatabaseConfig.getInstance().getUser(),
+                DatabaseConfig.getInstance().getPass());
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            
+            ps.setString(1, cepLimpo);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    Cep c = new Cep();
+                    c.setId_cep(rs.getString("id_cep"));
+                    c.setCidade(rs.getString("cidade"));
+                    c.setBairro(rs.getString("bairro"));
+                    c.setLogradouro(rs.getString("logradouro"));
+                    c.setEstado(rs.getString("estado"));
+                    c.setObservacoes(rs.getString("observacoes"));
+                    return c;
+                }
+            }
+        } catch (SQLException e) {
+            System.err.println("❌ [CepDAO] Erro: " + e.getMessage());
+        }
+        return null;
+    }
+    
 }
