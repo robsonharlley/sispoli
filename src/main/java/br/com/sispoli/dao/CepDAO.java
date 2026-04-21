@@ -76,7 +76,7 @@ public class CepDAO {
     
     public List<Cep> listarTodosParaCombo() {
         List<Cep> lista = new ArrayList<>();
-        String sql = "SELECT id_cep, logradouro, bairro, cidade, estado, observacoes FROM tabceps ORDER BY logradouro";
+        String sql = "SELECT id_cep, logradouro, bairro, cidade, estado, observacoes FROM tabceps ORDER BY logradouro ASC, id_cep ASC";
         try (Connection conn = DriverManager.getConnection(
                 DatabaseConfig.getInstance().getConnectionUrl(),
                 DatabaseConfig.getInstance().getUser(),

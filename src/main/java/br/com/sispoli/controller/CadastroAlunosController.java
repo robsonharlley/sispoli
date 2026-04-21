@@ -160,9 +160,11 @@ public class CadastroAlunosController {
                 dados[i] = new Object[] {
                     a.getIdAluno(),
                     a.getNomeCompleto(),
-                    a.getCpf(), // Já formatado ou não, conforme DAO
+                    formatarCPF(a.getCpf()),           // 🟢 CPF com máscara
+                   // a.getCpf(), 
                     a.getStatus(),
-                    a.getContatoWhat(),
+                    formatarWhatsapp(a.getContatoWhat()), // 🟢 WhatsApp com máscara
+                   // a.getContatoWhat(),
                     a.getEmail()
                 };
             }
@@ -183,10 +185,54 @@ public class CadastroAlunosController {
 
     private boolean validar() {
         if (view.getNome().length() < 3) { view.erro("Nome deve ter pelo menos 3 caracteres."); return false; }
-        if (!view.getCpf().matches("\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}")) { view.erro("CPF inválido. Use 000.000.000-00."); return false; }
+
+            if (view.getNome().trim().length() < 3) {
+                view.erro("Nome deve ter pelo menos 3 caracteres.");
+                return false;
+            }
+
+            // ✅ VALIDAÇÃO ALGORÍTMICA DO CPF
+            String cpf = view.getCpf();
+            if (!br.com.sispoli.util.CpfUtil.isValid(cpf)) {
+                view.erro("❌ CPF inválido! Verifique os dígitos verificadores.");
+                return false;
+            }
+
+            if (view.getEmail().isEmpty() || !view.getEmail().contains("@")) {
+                view.erro("Email inválido.");
+                return false;
+            }
+            if (view.getCepSelecionadoId() == null || view.getCepSelecionadoId().length() != 8) {
+                view.erro("Selecione um CEP válido da lista.");
+                return false;
+            }
+            if (view.getDataNasc() == null) {
+                view.erro("Data de nascimento é obrigatória.");
+                return false;
+            }
+        
         if (view.getEmail().isEmpty() || !view.getEmail().contains("@")) { view.erro("Email inválido."); return false; }
         if (view.getCepSelecionadoId() == null || view.getCepSelecionadoId().length() != 8) { view.erro("CEP inválido. Selecione da lista."); return false; }
         if (view.getDataNasc() == null) { view.erro("Data de nascimento é obrigatória."); return false; }
         return true;
     }
+    
+    /** Formata CPF: 12345678900 → 123.456.789-00 */
+    private String formatarCPF(String cpf) {
+        if (cpf == null) return "";
+        String digits = cpf.replaceAll("\\D", "");
+        return digits.length() == 11 
+            ? digits.replaceFirst("(\\d{3})(\\d{3})(\\d{3})(\\d{2})", "$1.$2.$3-$4") 
+            : cpf;
+    }
+
+    /** Formata WhatsApp: 11999998888 → (11) 99999-8888 */
+    private String formatarWhatsapp(String tel) {
+        if (tel == null) return "";
+        String digits = tel.replaceAll("\\D", "");
+        if (digits.length() == 11) return digits.replaceFirst("(\\d{2})(\\d{5})(\\d{4})", "($1) $2-$3");
+        if (digits.length() == 10) return digits.replaceFirst("(\\d{2})(\\d{4})(\\d{4})", "($1) $2-$3");
+        return tel; // Retorna original se não bater com padrão BR
+    }
+    
 }
