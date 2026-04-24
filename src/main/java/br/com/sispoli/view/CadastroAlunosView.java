@@ -150,6 +150,8 @@ public class CadastroAlunosView extends JFrame {
 		gridPanel.add(new JScrollPane(tblAlunos), BorderLayout.CENTER);
 		JButton btnAtt = new JButton("🔄 Atualizar Lista");
 		gridPanel.add(btnAtt, BorderLayout.SOUTH);
+		
+		
 
 		// =====================================================================
 		// ✅ PASSO 5: Usar JSplitPane para dividir formulário (scroll) e tabela
@@ -235,16 +237,11 @@ public class CadastroAlunosView extends JFrame {
 		p.add(txtRG, gbc(gbc, 3, 1, 1));
 
 		p.add(new JLabel("Nascimento:"), gbc(gbc, 0, 2, 1));
-		// ✅ Substituir JSpinner por JFormattedTextField com máscara de data
 		txtDataNasc = createMaskField("##/##/####");
 		txtDataNasc.setToolTipText("Digite a data no formato DD/MM/AAAA");
 		txtDataNasc.setColumns(10);
 		p.add(txtDataNasc, gbc(gbc, 1, 2, 1));
 
-		/*
-		 * p.add(new JLabel("Nascimento:"), gbc(gbc, 0, 2, 1)); spnDataNasc =
-		 * createDateSpinner(); p.add(spnDataNasc, gbc(gbc, 1, 2, 1));
-		 */
 		p.add(new JLabel("Sexo:"), gbc(gbc, 2, 2, 1));
 		cmbSexo = new JComboBox<>(new String[] { "", "Masculino", "Feminino", "Outro" });
 		p.add(cmbSexo, gbc(gbc, 3, 2, 1));
@@ -370,7 +367,7 @@ public class CadastroAlunosView extends JFrame {
 		p.add(spnDataMatricula, gbc(gbc, 1, 0, 1));
 
 		p.add(new JLabel("Status:"), gbc(gbc, 2, 0, 1));
-		cmbStatus = new JComboBox<>(new String[] { "Ativo", "Inativo", "Aguardando", "Trancado", "Cancelado" });
+		cmbStatus = new JComboBox<>(new String[] { "Ativo", "Inativo", "Aguardando", "Trancado" });
 		p.add(cmbStatus, gbc(gbc, 3, 0, 1));
 
 		p.add(new JLabel("É Isento?"), gbc(gbc, 4, 0, 1));
@@ -379,12 +376,22 @@ public class CadastroAlunosView extends JFrame {
 
 		p.add(new JLabel("Motivo Isenção:"), gbc(gbc, 6, 0, 1));
 		cmbMotivoIsencao = new JComboBox<>(new String[] { "", "Idoso", "Programa Social", "Deficiente" });
+		cmbMotivoIsencao.setSelectedIndex(0); // Garante que inicie com a opção vazia;
+		cmbMotivoIsencao.setEnabled(false);
+		cmbMotivoIsencao.setBackground(new Color(240, 240, 240)); // feedback visual
 		p.add(cmbMotivoIsencao, gbc(gbc, 7, 0, 1));
 
-		// Listener para habilitar campos de cancelamento
-		cmbStatus.addActionListener(e -> {
-			boolean cancelado = "Cancelado".equals(cmbStatus.getSelectedItem());
-			// Controller deve lidar com isso via listener externo ou método público
+		// ✅ Listener para controlar a edição do campo de motivo
+		chkIsento.addActionListener(e -> {
+			boolean isento = chkIsento.isSelected();
+			cmbMotivoIsencao.setEnabled(isento);
+			cmbMotivoIsencao.setBackground(isento ? Color.WHITE : new Color(240, 240, 240));
+
+			// Listener desmarcar, limpa o campo automaticamente
+			if (!isento) {
+				cmbMotivoIsencao.setSelectedIndex(0);
+			}
+			cmbMotivoIsencao.repaint();
 		});
 
 		return p;
@@ -644,11 +651,26 @@ public class CadastroAlunosView extends JFrame {
 	}
 
 	public Boolean getIsento() {
-		return chkIsento.isSelected();
+		return chkIsento.isSelected(); // ✅ Retorna true/false, nunca null
 	}
 
+	// ✅ Getter atualizado - retorna NULL quando apropriado
 	public String getMotivoIsencao() {
-		return (String) cmbMotivoIsencao.getSelectedItem();
+		// Se NÃO for isento, retorna NULL (respeita o padrão do banco)
+		if (!chkIsento.isSelected()) {
+			return null;
+		}
+
+		// Se for isento, mas não selecionou motivo válido, retorna NULL temporariamente
+		// (a validação vai impedir o salvamento neste caso)
+		Object selectedItem = cmbMotivoIsencao.getSelectedItem();
+		if (selectedItem == null || cmbMotivoIsencao.getSelectedIndex() == 0
+				|| selectedItem.toString().trim().isEmpty()) {
+			return null;
+		}
+
+		// Retorna o motivo apenas quando realmente é isento e tem motivo válido
+		return selectedItem.toString().trim();
 	}
 
 	public String getNomeEmergencia() {
@@ -821,13 +843,6 @@ public class CadastroAlunosView extends JFrame {
 		setLocalDate(spnDataAceite, d);
 	}
 
-	/*
-	 * public void setDataCancelamento(LocalDate d) {
-	 * setLocalDate(spnDataCancelamento, d); }
-	 * 
-	 * public void setMotivoCancelamento(String v) {
-	 * txtMotivoCancelamento.setText(v); }
-	 */
 	public void setObs(String v) {
 		txtObs.setText(v);
 	}
@@ -858,6 +873,7 @@ public class CadastroAlunosView extends JFrame {
 		cmbStatus.setSelectedIndex(0);
 		chkIsento.setSelected(false);
 		cmbMotivoIsencao.setSelectedIndex(0);
+		cmbMotivoIsencao.setEnabled(false); // garantir que inicie desabilitado
 
 		// Emergência
 		txtNomeEmergencia.setText("");
@@ -912,4 +928,73 @@ public class CadastroAlunosView extends JFrame {
 		return date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
 	}
 
+	// ✅ VALIDAÇÃO CORRIGIDA E SIMPLIFICADA
+	public boolean validarCamposObrigatorios() {
+		StringBuilder erros = new StringBuilder();
+
+		// Validar campos básicos
+		if (getNome().isEmpty()) {
+			erros.append("• Nome é obrigatório\n");
+		}
+
+		if (getCpf().isEmpty() || getCpf().equals("___.___.___-__")) {
+			erros.append("• CPF é obrigatório\n");
+		}
+
+		if (getDataNasc() == null) {
+			erros.append("• Data de nascimento é obrigatória\n");
+		}
+
+		if (getSexo() == null || getSexo().isEmpty()) {
+			erros.append("• Sexo é obrigatório\n");
+		}
+
+		// ✅ VALIDAÇÃO CORRIGIDA - só exige motivo quando checkbox está marcado
+		if (chkIsento.isSelected()) {
+			Object selectedItem = cmbMotivoIsencao.getSelectedItem();
+			if (selectedItem == null || cmbMotivoIsencao.getSelectedIndex() == 0
+					|| selectedItem.toString().trim().isEmpty()) {
+				erros.append("• Motivo da isenção é obrigatório quando aluno é isento\n");
+			}
+		}
+
+		// Validar endereço básico
+		if (getLogradouro().isEmpty()) {
+			erros.append("• Logradouro é obrigatório\n");
+		}
+
+		if (getNumero().isEmpty()) {
+			erros.append("• Número é obrigatório\n");
+		}
+
+		if (getBairro().isEmpty()) {
+			erros.append("• Bairro é obrigatório\n");
+		}
+
+		if (getCidade().isEmpty()) {
+			erros.append("• Cidade é obrigatória\n");
+		}
+
+		if (getEstado().isEmpty()) {
+			erros.append("• Estado é obrigatório\n");
+		}
+
+		// Validar termos
+		if (!getAceite()) {
+			erros.append("• Aceite dos termos é obrigatório\n");
+		}
+
+		if (erros.length() > 0) {
+			erro("Por favor, corrija os seguintes erros:\n\n" + erros.toString());
+			return false;
+		}
+
+		if (erros.length() > 0) {
+			erro("Por favor, corrija os seguintes erros:\n\n" + erros.toString());
+			return false;
+		}
+
+		return true;
+
+	}
 }

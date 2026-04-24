@@ -120,7 +120,8 @@ public class CadastroAlunosController {
         } catch (RuntimeException ex) {
             String msg = ex.getMessage();
             if (msg.contains("Duplicate") || msg.contains("1062")) {
-                view.erro("❌ CPF ou Email já cadastrados.");
+                //view.erro("❌ CPF ou Email já cadastrados.");
+            	view.erro("❌ CPF já cadastrado!.");
             } else if (msg.contains("1452")) {
                 view.erro("❌ CEP informado não existe na base. Selecione da lista.");
             } else {

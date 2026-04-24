@@ -10,12 +10,7 @@ public class Aluno {
     private String contatoEmergenciaNome, contatoEmergenciaTelefone, contatoEmergenciaParentesco;
     private String observacoes, motivoIsencao, status;
 
-    public Aluno() {}
-    // Getters & Setters (padrão, omitidos por brevidade mas necessários)
-    // Ex: public int getIdAluno() { return idAluno; } public void setIdAluno(int v) { this.idAluno = v; }
-    // ... adicione todos os getters/setters correspondentes ...
-
-	public int getIdAluno() {
+   	public int getIdAluno() {
 		return idAluno;
 	}
 
