@@ -4,11 +4,11 @@ import java.time.LocalDate;
 public class Aluno {
     private int idAluno;
     private String nomeCompleto, cpf, rg, sexo, email, contatoWhat, idCep, numero, complemento;
-    private LocalDate dataNascimento, dataMatricula, dataCancelamento, dataAceiteTermos;
+    private LocalDate dataNascimento, dataMatricula, dataAceiteTermos;
     private Boolean isento, possuiRestricaoMedica, autorizacaoImagem, autorizacaoDivulgacao, aceiteTermos;
     private String descricaoRestricao, medicamentosContinuos, alergias;
     private String contatoEmergenciaNome, contatoEmergenciaTelefone, contatoEmergenciaParentesco;
-    private String motivoCancelamento, observacoes, motivoIsencao, status;
+    private String observacoes, motivoIsencao, status;
 
     public Aluno() {}
     // Getters & Setters (padrão, omitidos por brevidade mas necessários)
@@ -111,13 +111,6 @@ public class Aluno {
 		this.dataMatricula = dataMatricula;
 	}
 
-	public LocalDate getDataCancelamento() {
-		return dataCancelamento;
-	}
-
-	public void setDataCancelamento(LocalDate dataCancelamento) {
-		this.dataCancelamento = dataCancelamento;
-	}
 
 	public LocalDate getDataAceiteTermos() {
 		return dataAceiteTermos;
@@ -215,13 +208,6 @@ public class Aluno {
 		this.contatoEmergenciaParentesco = contatoEmergenciaParentesco;
 	}
 
-	public String getMotivoCancelamento() {
-		return motivoCancelamento;
-	}
-
-	public void setMotivoCancelamento(String motivoCancelamento) {
-		this.motivoCancelamento = motivoCancelamento;
-	}
 
 	public String getObservacoes() {
 		return observacoes;

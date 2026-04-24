@@ -286,6 +286,7 @@ public class CadastroAlunosView extends JFrame {
 		gbc.gridx = 3;
 		gbc.weightx = 0.65;
 		txtLogradouro = new JTextField();
+		txtLogradouro.setEditable(false); // ✅ Impede digitação manual (mantém integridade do DB)
 		p.add(txtLogradouro, gbc);
 
 		// 🔹 LINHA 2: Número + Complemento + Bairro
@@ -313,6 +314,7 @@ public class CadastroAlunosView extends JFrame {
 		gbc.gridx = 5;
 		gbc.weightx = 0.35;
 		txtBairro = new JTextField();
+		txtBairro.setEditable(false); // ✅ Impede digitação manual (mantém integridade do DB)
 		p.add(txtBairro, gbc);
 
 		// 🔹 LINHA 3: Cidade + Estado + Obs. Endereço
@@ -326,6 +328,7 @@ public class CadastroAlunosView extends JFrame {
 		gbc.gridx = 1;
 		gbc.weightx = 0.4;
 		txtCidade = new JTextField();
+		txtCidade.setEditable(false); // ✅ Impede digitação manual (mantém integridade do DB)
 		p.add(txtCidade, gbc);
 
 		gbc.gridx = 2;
