@@ -45,9 +45,9 @@ import br.com.sispoli.model.Cep;
 
 public class CadastroAlunosView extends JFrame {
 	// === DADOS PESSOAIS ===
-	private JTextField txtNome, txtRG, txtEmail, txtNumero, txtComplemento;
+	private JTextField txtNome, txtRG, txtEmail, txtNumero, txtComplemento, txtDataNasc;
 	private JFormattedTextField txtCPF, txtWhatsApp;
-	private JSpinner spnDataNasc;
+	// private JSpinner spnDataNasc;
 	private JComboBox<String> cmbSexo;
 
 	// === ENDEREÇO (tabceps + tabalunos) ===
@@ -74,10 +74,6 @@ public class CadastroAlunosView extends JFrame {
 	// === AUTORIZAÇÕES & TERMOS ===
 	private JCheckBox chkImg, chkDivulg, chkTermos;
 	private JSpinner spnDataAceite;
-
-	// === CANCELAMENTO ===
-	//private JSpinner spnDataCancelamento;
-	//private JTextField txtMotivoCancelamento;
 
 	// === OBSERVAÇÕES & AÇÕES ===
 	private JTextArea txtObs;
@@ -125,8 +121,6 @@ public class CadastroAlunosView extends JFrame {
 		formPanel.add(Box.createVerticalStrut(10));
 		formPanel.add(criarSeccao("📜 Autorizações & Termos", criarPanelAutorizacoes()));
 		formPanel.add(Box.createVerticalStrut(10));
-		//formPanel.add(criarSeccao("❌ Cancelamento", criarPanelCancelamento()));
-		//formPanel.add(Box.createVerticalStrut(15));
 		formPanel.add(criarPanelObsEBotoes());
 		formPanel.add(Box.createVerticalStrut(20)); // Espaço final
 
@@ -241,9 +235,16 @@ public class CadastroAlunosView extends JFrame {
 		p.add(txtRG, gbc(gbc, 3, 1, 1));
 
 		p.add(new JLabel("Nascimento:"), gbc(gbc, 0, 2, 1));
-		spnDataNasc = createDateSpinner();
-		p.add(spnDataNasc, gbc(gbc, 1, 2, 1));
+		// ✅ Substituir JSpinner por JFormattedTextField com máscara de data
+		txtDataNasc = createMaskField("##/##/####");
+		txtDataNasc.setToolTipText("Digite a data no formato DD/MM/AAAA");
+		txtDataNasc.setColumns(10);
+		p.add(txtDataNasc, gbc(gbc, 1, 2, 1));
 
+		/*
+		 * p.add(new JLabel("Nascimento:"), gbc(gbc, 0, 2, 1)); spnDataNasc =
+		 * createDateSpinner(); p.add(spnDataNasc, gbc(gbc, 1, 2, 1));
+		 */
 		p.add(new JLabel("Sexo:"), gbc(gbc, 2, 2, 1));
 		cmbSexo = new JComboBox<>(new String[] { "", "Masculino", "Feminino", "Outro" });
 		p.add(cmbSexo, gbc(gbc, 3, 2, 1));
@@ -347,7 +348,7 @@ public class CadastroAlunosView extends JFrame {
 		p.add(txtCepObs, gbc);
 
 		// Listener de auto-preenchimento (mantido)
-		
+
 		cmbCep.addActionListener(e -> {
 			String sel = cmbCep.getSelectedItem() != null ? cmbCep.getSelectedItem().toString() : "";
 			if (sel.contains(" - "))
@@ -400,7 +401,8 @@ public class CadastroAlunosView extends JFrame {
 		p.add(txtTelEmergencia, gbc(gbc, 4, 0, 1));
 
 		p.add(new JLabel("Parentesco:"), gbc(gbc, 5, 0, 1));
-		cmbParentesco = new JComboBox<>(new String[] { "", "Pai", "Mãe", "Esposa(o)", "Avó", "Avô", "Tio(a)", "Outro" });
+		cmbParentesco = new JComboBox<>(
+				new String[] { "", "Pai", "Mãe", "Esposa(o)", "Avó", "Avô", "Tio(a)", "Outro" });
 		p.add(cmbParentesco, gbc(gbc, 6, 0, 1));
 
 		return p;
@@ -454,22 +456,6 @@ public class CadastroAlunosView extends JFrame {
 		return p;
 	}
 
-/*	private JPanel criarPanelCancelamento() {
-		JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
-
-		p.add(new JLabel("Data Cancelamento:"));
-		spnDataCancelamento = createDateSpinner();
-		spnDataCancelamento.setEnabled(false);
-		p.add(spnDataCancelamento);
-
-		p.add(new JLabel("Motivo:"));
-		txtMotivoCancelamento = new JTextField(30);
-		txtMotivoCancelamento.setEnabled(false);
-		p.add(txtMotivoCancelamento);
-
-		return p;
-	}
-*/
 	private JPanel criarPanelObsEBotoes() {
 		JPanel p = new JPanel(new BorderLayout(10, 5));
 
@@ -602,7 +588,7 @@ public class CadastroAlunosView extends JFrame {
 	}
 
 	public LocalDate getDataNasc() {
-		return getLocalDate(spnDataNasc);
+		return parseDate(txtDataNasc.getText());
 	}
 
 	public String getSexo() {
@@ -705,15 +691,7 @@ public class CadastroAlunosView extends JFrame {
 	public LocalDate getDataAceite() {
 		return getLocalDate(spnDataAceite);
 	}
-/*
-	public LocalDate getDataCancelamento() {
-		return getLocalDate(spnDataCancelamento);
-	}
 
-	public String getMotivoCancelamento() {
-		return txtMotivoCancelamento.getText().trim();
-	}
-*/
 	public String getObs() {
 		return txtObs.getText();
 	}
@@ -732,7 +710,7 @@ public class CadastroAlunosView extends JFrame {
 	}
 
 	public void setDataNasc(LocalDate d) {
-		setLocalDate(spnDataNasc, d);
+		txtDataNasc.setText(d != null ? formatDate(d) : "");
 	}
 
 	public void setSexo(String v) {
@@ -839,15 +817,14 @@ public class CadastroAlunosView extends JFrame {
 	public void setDataAceite(LocalDate d) {
 		setLocalDate(spnDataAceite, d);
 	}
-/*
-	public void setDataCancelamento(LocalDate d) {
-		setLocalDate(spnDataCancelamento, d);
-	}
 
-	public void setMotivoCancelamento(String v) {
-		txtMotivoCancelamento.setText(v);
-	}
-*/
+	/*
+	 * public void setDataCancelamento(LocalDate d) {
+	 * setLocalDate(spnDataCancelamento, d); }
+	 * 
+	 * public void setMotivoCancelamento(String v) {
+	 * txtMotivoCancelamento.setText(v); }
+	 */
 	public void setObs(String v) {
 		txtObs.setText(v);
 	}
@@ -858,7 +835,7 @@ public class CadastroAlunosView extends JFrame {
 		txtNome.setText("");
 		txtCPF.setText("");
 		txtRG.setText("");
-		setDataNasc(null);
+		txtDataNasc.setText(""); // ✅ Limpar campo de data formatado
 		cmbSexo.setSelectedIndex(0);
 		txtEmail.setText("");
 		txtWhatsApp.setText("");
@@ -898,17 +875,38 @@ public class CadastroAlunosView extends JFrame {
 		spnDataAceite.setEnabled(false);
 		setDataAceite(null);
 
-/*		// Cancelamento
-		spnDataCancelamento.setEnabled(false);
-		setDataCancelamento(null);
-		txtMotivoCancelamento.setEnabled(false);
-		txtMotivoCancelamento.setText("");
-*/
 		// Observações & Grid
 		txtObs.setText("");
 		tblAlunos.clearSelection();
 		txtNome.requestFocusInWindow();
 	}
-	
-	
+
+	// Método para converter String formatada para LocalDate
+	private LocalDate parseDate(String dateStr) {
+		if (dateStr == null || dateStr.trim().isEmpty() || dateStr.equals("__/__/____")) {
+			return null;
+		}
+		try {
+			// Remover caracteres não numéricos e validar formato
+			String cleanDate = dateStr.replaceAll("[^0-9]", "");
+			if (cleanDate.length() == 8) {
+				String formattedDate = cleanDate.substring(0, 2) + "/" + cleanDate.substring(2, 4) + "/"
+						+ cleanDate.substring(4, 8);
+				return LocalDate.parse(formattedDate, DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+			}
+		} catch (Exception e) {
+			// Data inválida
+			return null;
+		}
+		return null;
+	}
+
+	// Método para formatar LocalDate para String
+	private String formatDate(LocalDate date) {
+		if (date == null) {
+			return "";
+		}
+		return date.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+	}
+
 }

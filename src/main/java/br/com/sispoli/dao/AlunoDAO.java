@@ -32,8 +32,6 @@ public class AlunoDAO {
 			ps.setString(idx++, a.getComplemento());
 			setLocalDate(ps, idx++, a.getDataNascimento());
 			setLocalDate(ps, idx++, a.getDataMatricula());
-			//setLocalDate(ps, idx++, a.getDataCancelamento());
-			//ps.setString(idx++, a.getMotivoCancelamento());
 			ps.setString(idx++, a.getStatus());
 			ps.setBoolean(idx++, a.getIsento() != null ? a.getIsento() : false);
 			ps.setString(idx++, a.getMotivoIsencao());
@@ -88,8 +86,6 @@ public class AlunoDAO {
 				a.setComplemento(rs.getString("complemento"));
 				a.setDataNascimento(getLocalDate(rs, "data_nascimento"));
 				a.setDataMatricula(getLocalDate(rs, "data_matricula"));
-				//a.setDataCancelamento(getLocalDate(rs, "data_cancelamento"));
-				//a.setMotivoCancelamento(rs.getString("motivo_cancelamento"));
 				a.setStatus(rs.getString("status"));
 				a.setIsento(rs.getBoolean("isento"));
 				a.setMotivoIsencao(rs.getString("motivo_isencao"));
