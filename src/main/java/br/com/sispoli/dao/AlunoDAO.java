@@ -16,8 +16,8 @@ public class AlunoDAO {
 	public void salvar(Aluno a) {
 		boolean update = a.getIdAluno() > 0;
 		String sql = update
-				? "UPDATE tabalunos SET nome_completo=?, cpf=?, rg=?, sexo=?, email=?, contato_what=?, id_cep=?, numero=?, complemento=?, data_nascimento=?, data_matricula=?, data_cancelamento=?, motivo_cancelamento=?, status=?, isento=?, motivo_isencao=?, possui_restricao_medica=?, descricao_restricao=?, medicamentos_continuos=?, alergias=?, contato_emergencia_nome=?, contato_emergencia_telefone=?, contato_emergencia_parentesco=?, autorizacao_imagem=?, autorizacao_divulgacao=?, aceite_termos=?, data_aceite_termos=?, observacoes=? WHERE id_aluno=?"
-				: "INSERT INTO tabalunos (nome_completo, cpf, rg, sexo, email, contato_what, id_cep, numero, complemento, data_nascimento, data_matricula, data_cancelamento, motivo_cancelamento, status, isento, motivo_isencao, possui_restricao_medica, descricao_restricao, medicamentos_continuos, alergias, contato_emergencia_nome, contato_emergencia_telefone, contato_emergencia_parentesco, autorizacao_imagem, autorizacao_divulgacao, aceite_termos, data_aceite_termos, observacoes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+				? "UPDATE tabalunos SET nome_completo=?, cpf=?, rg=?, sexo=?, email=?, contato_what=?, id_cep=?, numero=?, complemento=?, data_nascimento=?, data_matricula=?, status=?, isento=?, motivo_isencao=?, possui_restricao_medica=?, descricao_restricao=?, medicamentos_continuos=?, alergias=?, contato_emergencia_nome=?, contato_emergencia_telefone=?, contato_emergencia_parentesco=?, autorizacao_imagem=?, autorizacao_divulgacao=?, aceite_termos=?, data_aceite_termos=?, observacoes=? WHERE id_aluno=?"
+				: "INSERT INTO tabalunos (nome_completo, cpf, rg, sexo, email, contato_what, id_cep, numero, complemento, data_nascimento, data_matricula, status, isento, motivo_isencao, possui_restricao_medica, descricao_restricao, medicamentos_continuos, alergias, contato_emergencia_nome, contato_emergencia_telefone, contato_emergencia_parentesco, autorizacao_imagem, autorizacao_divulgacao, aceite_termos, data_aceite_termos, observacoes) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
 		try (Connection conn = getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
 			int idx = 1;
@@ -32,8 +32,8 @@ public class AlunoDAO {
 			ps.setString(idx++, a.getComplemento());
 			setLocalDate(ps, idx++, a.getDataNascimento());
 			setLocalDate(ps, idx++, a.getDataMatricula());
-			setLocalDate(ps, idx++, a.getDataCancelamento());
-			ps.setString(idx++, a.getMotivoCancelamento());
+			//setLocalDate(ps, idx++, a.getDataCancelamento());
+			//ps.setString(idx++, a.getMotivoCancelamento());
 			ps.setString(idx++, a.getStatus());
 			ps.setBoolean(idx++, a.getIsento() != null ? a.getIsento() : false);
 			ps.setString(idx++, a.getMotivoIsencao());
@@ -88,8 +88,8 @@ public class AlunoDAO {
 				a.setComplemento(rs.getString("complemento"));
 				a.setDataNascimento(getLocalDate(rs, "data_nascimento"));
 				a.setDataMatricula(getLocalDate(rs, "data_matricula"));
-				a.setDataCancelamento(getLocalDate(rs, "data_cancelamento"));
-				a.setMotivoCancelamento(rs.getString("motivo_cancelamento"));
+				//a.setDataCancelamento(getLocalDate(rs, "data_cancelamento"));
+				//a.setMotivoCancelamento(rs.getString("motivo_cancelamento"));
 				a.setStatus(rs.getString("status"));
 				a.setIsento(rs.getBoolean("isento"));
 				a.setMotivoIsencao(rs.getString("motivo_isencao"));

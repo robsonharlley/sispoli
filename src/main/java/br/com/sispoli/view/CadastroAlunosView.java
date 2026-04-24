@@ -76,8 +76,8 @@ public class CadastroAlunosView extends JFrame {
 	private JSpinner spnDataAceite;
 
 	// === CANCELAMENTO ===
-	private JSpinner spnDataCancelamento;
-	private JTextField txtMotivoCancelamento;
+	//private JSpinner spnDataCancelamento;
+	//private JTextField txtMotivoCancelamento;
 
 	// === OBSERVAÇÕES & AÇÕES ===
 	private JTextArea txtObs;
@@ -125,8 +125,8 @@ public class CadastroAlunosView extends JFrame {
 		formPanel.add(Box.createVerticalStrut(10));
 		formPanel.add(criarSeccao("📜 Autorizações & Termos", criarPanelAutorizacoes()));
 		formPanel.add(Box.createVerticalStrut(10));
-		formPanel.add(criarSeccao("❌ Cancelamento", criarPanelCancelamento()));
-		formPanel.add(Box.createVerticalStrut(15));
+		//formPanel.add(criarSeccao("❌ Cancelamento", criarPanelCancelamento()));
+		//formPanel.add(Box.createVerticalStrut(15));
 		formPanel.add(criarPanelObsEBotoes());
 		formPanel.add(Box.createVerticalStrut(20)); // Espaço final
 
@@ -454,7 +454,7 @@ public class CadastroAlunosView extends JFrame {
 		return p;
 	}
 
-	private JPanel criarPanelCancelamento() {
+/*	private JPanel criarPanelCancelamento() {
 		JPanel p = new JPanel(new FlowLayout(FlowLayout.LEFT, 10, 5));
 
 		p.add(new JLabel("Data Cancelamento:"));
@@ -469,7 +469,7 @@ public class CadastroAlunosView extends JFrame {
 
 		return p;
 	}
-
+*/
 	private JPanel criarPanelObsEBotoes() {
 		JPanel p = new JPanel(new BorderLayout(10, 5));
 
@@ -705,7 +705,7 @@ public class CadastroAlunosView extends JFrame {
 	public LocalDate getDataAceite() {
 		return getLocalDate(spnDataAceite);
 	}
-
+/*
 	public LocalDate getDataCancelamento() {
 		return getLocalDate(spnDataCancelamento);
 	}
@@ -713,7 +713,7 @@ public class CadastroAlunosView extends JFrame {
 	public String getMotivoCancelamento() {
 		return txtMotivoCancelamento.getText().trim();
 	}
-
+*/
 	public String getObs() {
 		return txtObs.getText();
 	}
@@ -839,7 +839,7 @@ public class CadastroAlunosView extends JFrame {
 	public void setDataAceite(LocalDate d) {
 		setLocalDate(spnDataAceite, d);
 	}
-
+/*
 	public void setDataCancelamento(LocalDate d) {
 		setLocalDate(spnDataCancelamento, d);
 	}
@@ -847,7 +847,7 @@ public class CadastroAlunosView extends JFrame {
 	public void setMotivoCancelamento(String v) {
 		txtMotivoCancelamento.setText(v);
 	}
-
+*/
 	public void setObs(String v) {
 		txtObs.setText(v);
 	}
@@ -898,12 +898,12 @@ public class CadastroAlunosView extends JFrame {
 		spnDataAceite.setEnabled(false);
 		setDataAceite(null);
 
-		// Cancelamento
+/*		// Cancelamento
 		spnDataCancelamento.setEnabled(false);
 		setDataCancelamento(null);
 		txtMotivoCancelamento.setEnabled(false);
 		txtMotivoCancelamento.setText("");
-
+*/
 		// Observações & Grid
 		txtObs.setText("");
 		tblAlunos.clearSelection();
